@@ -1,0 +1,12 @@
+[general]
+name=PDND QGIS Client
+qgisMinimumVersion=3.0
+description=Pannello PDND per connessioni API con token JWT
+version=1.0
+author=Francesco Loreti
+email=francesco.loreti@isprambiente.it
+about=Plugin PDND con pannello nel Browser Panel
+category=Browser
+icon=icon.png
+experimental=False
+deprecated=False

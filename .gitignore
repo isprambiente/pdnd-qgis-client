@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
+
+# QGIS plugin build artifacts
+*.zip
+*.tar.gz
+
+# Logs
+*.log
+
+# PDND token cache
+token_cache.json
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Backup files
+*.bak
+*.old
+
+# Connessioni
+connections/
+connections/*.json
+
