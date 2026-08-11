@@ -40,7 +40,7 @@
 ### 1. Clona il repository
 
 ```bash
-git clone https://github.com/<tuo-utente>/pdnd-qgis-client.git
+git clone https://github.com/isprambiente/pdnd-qgis-client.git
 ```
 ### 2. Copia il plugin nella cartella dei plugin QGIS
 
@@ -104,7 +104,7 @@ Il file JSON deve contenere la tua chiave privata nel formato JWK (JSON Web Key)
 
 ---
 
-## 🏛 Riuso e PublicCode
+## Riuso e PublicCode
 
 Questo repository è conforme ai requisiti di PublicCode per il riuso nel settore pubblico italiano.
 
@@ -122,7 +122,7 @@ doc: documentazione completa
 
 ---
 
-## ⚖️ Licenza
+## Licenza
 
 Questo progetto è rilasciato con licenza **MIT**.
 
