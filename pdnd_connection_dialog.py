@@ -34,7 +34,7 @@ class PdndConnectionDialog(QDialog):
         # Ambiente
         layout.addWidget(QLabel("Ambiente"))
         self.env_combo = QComboBox()
-        self.env_combo.addItems(["produzione", "collaudo"])
+        self.env_combo.addItems(["produzione", "collaudo", "attestazione"])
         layout.addWidget(self.env_combo)
 
         # Campi PDND
