@@ -1,0 +1,90 @@
+publiccodeYmlVersion: 0.5.0
+name: PDND QGIS Client
+applicationSuite: PDNDClient
+url: https://github.com/isprambiente/pdnd-qgis-client.git
+landingURL: https://github.com/isprambiente/pdnd-qgis-client
+softwareVersion: 1.0.0
+releaseDate: 2026-08-11
+logo: https://github.com/isprambiente/pdnd-qgis-client/blob/main/icon.png
+platforms:
+  - windows
+  - mac
+  - linux
+categories:
+  - application-development
+  - geographic-information-systems
+  - data-collection
+  - data-visualization
+  - workflow-management
+  - it-development
+  - it-security
+  - content-management
+organisation:
+  uri: https://www.isprambiente.gov.it
+  name: ISPRA
+usedBy:
+  - ISPRA
+developmentStatus: development
+softwareType: library
+description:
+  it-IT:
+    localisedName: PDND QGIS Client
+    shortDescription: Client QGIS per PDND
+    longDescription: >-
+      PDND QGIS Client è un plugin QGIS che permette di:
+
+      - configurare connessioni PDND tramite file JSON  
+
+      - generare automaticamente JWT e token PDND  
+
+      - interrogare API OAS3  
+
+      - estrarre endpoint WMS  
+
+      - estrarre endpoint GeoJSON 
+
+      - caricare layer WMS e GeoJSON protetti direttamente in QGIS  
+
+
+      È pensato per enti pubblici, ricercatori e sviluppatori che devono
+      integrare servizi geospaziali protetti tramite la Piattaforma Digitale
+      Nazionale Dati (PDND).
+    documentation: https://github.com/isprambiente/pdnd-qgis-client/blob/main/README.md
+    features:
+      - Gestione connessioni PDND (clientId, privateKey, kid, apiUrl)
+      - Generazione JWT + richiesta token PDND
+      - Parsing automatico del documento OAS3
+      - Individuazione degli endpoint WMS
+      - Individuazione degli endpoint GeoJSON
+      - Caricamento dei layer nel progetto QGIS
+      - Messaggi colorati tramite QGIS MessageBar
+      - Gestione errori PDND (token, API, OAS3)
+      - Compatibile con QGIS LTR 3.44+
+legal:
+  license: MIT
+maintenance:
+  type: internal
+  contacts:
+    - name: Francesco Loreti
+      email: francesco.loreti@isprambiente.it
+      phone: "0650072225"
+localisation:
+  localisationReady: false
+  availableLanguages:
+    - it
+dependsOn:
+  open:
+    - name: QGIS
+      versionMin: 3.44 LTS
+      version: 3.44 LTS
+      optional: false
+IT:
+  countryExtensionVersion: "1.0"
+  piattaforme:
+    spid: false
+    cie: false
+    anpr: false
+    pagopa: false
+    io: false
+  riuso:
+    codiceIPA: ispra_rm
