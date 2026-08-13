@@ -91,7 +91,7 @@ Il file JSON deve contenere la tua chiave privata nel formato JWK (JSON Web Key)
 
 ```json
 {
-  "<nome_connessione>": {
+  "<enviroment>": {
     "clientId": "…",
     "privateKey": "…",
     "kid": "…",
