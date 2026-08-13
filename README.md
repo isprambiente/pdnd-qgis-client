@@ -15,8 +15,9 @@
 - configurare connessioni PDND tramite file JSON  
 - generare automaticamente JWT e token PDND  
 - interrogare API OAS3  
-- estrarre endpoint WMS  
-- caricare layer WMS protetti direttamente in QGIS  
+- estrarre endpoint WMS
+- estrarre endpoint GeoJSON
+- caricare layer WMS e GeoJSON protetti direttamente in QGIS  
 
 È pensato per enti pubblici, ricercatori e sviluppatori che devono integrare servizi geospaziali protetti tramite la **Piattaforma Digitale Nazionale Dati (PDND)**.
 
@@ -27,7 +28,7 @@
 - Gestione connessioni PDND (clientId, privateKey, kid, apiUrl)
 - Generazione JWT + richiesta token PDND
 - Parsing automatico del documento OAS3
-- Individuazione degli endpoint WMS
+- Individuazione degli endpoint WMS e GeoJSON
 - Caricamento dei layer nel progetto QGIS
 - Messaggi colorati tramite QGIS MessageBar
 - Gestione errori PDND (token, API, OAS3)
@@ -96,7 +97,8 @@ Il file JSON deve contenere la tua chiave privata nel formato JWK (JSON Web Key)
     "kid": "…",
     "apiUrl": "https://api.pdnd/.../oas",
     "debug": false,
-    "pretty": false
+    "pretty": false,
+    "cache": false
   }
 }
 
