@@ -31,6 +31,9 @@ Thumbs.db
 *.old
 
 # Connessioni
-connections/
+connections
 connections/*.json
+
+cache
+keys
 
