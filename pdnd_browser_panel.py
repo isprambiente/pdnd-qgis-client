@@ -41,14 +41,6 @@ class PdndBrowserPanel(QWidget):
         btn_refresh.clicked.connect(self.refresh)
         btn_layout.addWidget(btn_refresh)
 
-        # btn_reload = QPushButton("Aggiorna Layer")
-        # btn_reload.clicked.connect(self.reload_layer)
-        # btn_layout.addWidget(btn_reload)
-
-        # btn_test = QPushButton("Test Connessione")
-        # btn_test.clicked.connect(self.test_connection)
-        # btn_layout.addWidget(btn_test)
-
         layout.addLayout(btn_layout)
 
         # ---------------------------------------------------------

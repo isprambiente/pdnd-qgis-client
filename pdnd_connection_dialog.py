@@ -164,16 +164,9 @@ class PdndConnectionDialog(QDialog):
         self.parent_panel.test_connection(name)
 
     def sanitize_filename(self, name: str) -> str:
-        # minuscolo
         name = name.lower().strip()
-
-        # sostituisci caratteri non validi con underscore
         name = re.sub(r"[^\w]+", "_", name)
-
-        # rimuovi underscore multipli
         name = re.sub(r"_+", "_", name)
-
-        # rimuovi underscore iniziali/finali
         name = name.strip("_")
 
         return name

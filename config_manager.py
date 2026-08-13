@@ -85,7 +85,7 @@ class ConfigManager:
         with open(path, "r") as f:
             index = json.load(f)
 
-        # index deve essere: { "rendis": "path/to/rendis.json", ... }
+        # index deve essere: { "nome": "path/to/nome.json", ... }
         self._save_index(index)
 
     def load_configuration(self, name):
