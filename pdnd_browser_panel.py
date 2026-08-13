@@ -1,11 +1,12 @@
 import os
 from qgis.PyQt.QtWidgets import (
-    QWidget, QVBoxLayout, QTreeWidget, QTreeWidgetItem, 
+    QWidget, QVBoxLayout, QTreeWidget, QTreeWidgetItem,
     QMenu, QDockWidget, QPushButton, QHBoxLayout
 )
 from qgis.PyQt.QtCore import Qt
 from .config_manager import ConfigManager
 from .pdnd_connection_dialog import PdndConnectionDialog
+from .pdnd_load_config_dialog import PdndLoadConfigDialog
 from .pdnd_layer_loader import PdndLayerLoader
 from .api_client import ApiClient
 from .pdnd_logger import log_info, log_error
@@ -23,24 +24,36 @@ class PdndBrowserPanel(QWidget):
 
         layout = QVBoxLayout()
 
+        # ---------------------------------------------------------
         # Barra comandi
+        # ---------------------------------------------------------
         btn_layout = QHBoxLayout()
 
         btn_new = QPushButton("Nuova Connessione")
         btn_new.clicked.connect(self.new_connection)
         btn_layout.addWidget(btn_new)
 
-        btn_refresh = QPushButton("Aggiorna")
+        btn_load_connections = QPushButton("Carica Connessioni")
+        btn_load_connections.clicked.connect(self.load_connections)
+        btn_layout.addWidget(btn_load_connections)
+
+        btn_refresh = QPushButton("Aggiorna Lista")
         btn_refresh.clicked.connect(self.refresh)
         btn_layout.addWidget(btn_refresh)
 
-        btn_test = QPushButton("Test Connessione")
-        btn_test.clicked.connect(self.test_connection)
-        btn_layout.addWidget(btn_test)
+        # btn_reload = QPushButton("Aggiorna Layer")
+        # btn_reload.clicked.connect(self.reload_layer)
+        # btn_layout.addWidget(btn_reload)
+
+        # btn_test = QPushButton("Test Connessione")
+        # btn_test.clicked.connect(self.test_connection)
+        # btn_layout.addWidget(btn_test)
 
         layout.addLayout(btn_layout)
 
+        # ---------------------------------------------------------
         # Albero connessioni
+        # ---------------------------------------------------------
         self.tree = QTreeWidget()
         self.tree.setHeaderLabel("Connessioni PDND")
         self.tree.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -52,14 +65,32 @@ class PdndBrowserPanel(QWidget):
 
         self.refresh()
 
+    # ---------------------------------------------------------
+    # Azioni UI
+    # ---------------------------------------------------------
     def double_click_load(self, item, column):
         name = item.text(0)
         loader = PdndLayerLoader(self.config_manager)
         try:
             loader.load(name)
-            self.msg_success(self.iface, "PDND", f"Layer '{name}' caricato correttamente.")
+            self.msg_success("PDND", f"Layer '{name}' caricato correttamente.")
         except Exception as e:
-            self.msg_critical(self.iface, "PDND", str(e))
+            self.msg_critical("PDND", str(e))
+
+    def reload_layer(self):
+        item = self.tree.currentItem()
+        if not item:
+            self.msg_warning("PDND", "Seleziona una connessione da aggiornare.")
+            return
+
+        name = item.text(0)
+        loader = PdndLayerLoader(self.config_manager)
+
+        try:
+            loader.load(name, refresh=True)
+            self.msg_success("PDND", f"Layer '{name}' aggiornato.")
+        except Exception as e:
+            self.msg_critical("PDND", str(e))
 
     def refresh(self):
         self.tree.clear()
@@ -67,107 +98,116 @@ class PdndBrowserPanel(QWidget):
             item = QTreeWidgetItem([name])
             self.tree.addTopLevelItem(item)
 
+    # ---------------------------------------------------------
+    # Menu contestuale
+    # ---------------------------------------------------------
     def open_menu(self, pos):
         item = self.tree.itemAt(pos)
         menu = QMenu()
 
         if item is None:
             menu.addAction("Nuova Connessione…", self.new_connection)
-            menu.addAction("Salva Connessioni…", self.save_connections)
+            menu.addAction("Aggiorna Lista", self.refresh)
             menu.addAction("Carica Connessioni…", self.load_connections)
         else:
             name = item.text(0)
-            menu.addAction("Carica Layer", lambda: PdndLayerLoader(self.config_manager))
+            menu.addAction("Carica Layer", lambda: self.load_pdnd_layer(name))
+            menu.addAction("Aggiorna Layer", lambda: self.reload_layer())
             menu.addAction("Test Connessione", lambda: self.test_connection(name))
             menu.addAction("Modifica Connessione…", lambda: self.edit_connection(name))
             menu.addAction("Elimina Connessione", lambda: self.delete_connection(name))
 
         menu.exec(self.tree.mapToGlobal(pos))
 
+    # ---------------------------------------------------------
+    # Gestione connessioni
+    # ---------------------------------------------------------
     def new_connection(self):
         dlg = PdndConnectionDialog(self.plugin_dir, self.iface, self)
         dlg.exec()
         self.refresh()
-    
+
     def edit_connection(self, name):
         json_path = self.config_manager.get_json_path(name)
         if not json_path:
-            self.iface.messageBar().pushCritical("PDND", f"Connessione '{name}' non trovata.")
+            self.msg_critical("PDND", f"Connessione '{name}' non trovata.")
             return
 
-        # Carica configurazione esistente
         cfg = self.config_manager.load_configuration(name)
         ambiente = self.config_manager.get_environment(name)
 
-        # Apri dialog in modalità modifica
-        dlg = PdndConnectionDialog(self.plugin_dir, self.iface, self, edit_mode=True, name=name, ambiente=ambiente, cfg=cfg)
+        dlg = PdndConnectionDialog(
+            self.plugin_dir, self.iface, self,
+            edit_mode=True, name=name, ambiente=ambiente, cfg=cfg
+        )
         dlg.exec()
-
         self.refresh()
-
 
     def save_connections(self):
         self.config_manager.export_connections()
 
     def load_connections(self):
-        self.config_manager.import_connections()
+        dlg = PdndLoadConfigDialog(self.plugin_dir, self.iface)
+        dlg.exec()
         self.refresh()
 
     def delete_connection(self, name):
         self.config_manager.delete_configuration(name)
         self.refresh()
 
+    # ---------------------------------------------------------
+    # Test connessione
+    # ---------------------------------------------------------
     def test_connection(self, name=None):
-        # Se non viene passato il nome, usa l'elemento selezionato
-        if name is None or name is False or name == "":
+        if not name:
             item = self.tree.currentItem()
             if not item:
-                self.iface.messageBar().pushWarning("PDND", "Seleziona una connessione da testare.")
+                self.msg_warning("PDND", "Seleziona una connessione da testare.")
                 return
             name = item.text(0)
 
-        # Percorso JSON
         json_path = self.config_manager.get_json_path(name)
         if not json_path:
-            self.iface.messageBar().pushCritical("PDND", f"Connessione '{name}' non trovata nell'index.json.")
+            self.msg_critical("PDND", f"Connessione '{name}' non trovata nell'index.json.")
             return
 
         try:
-            # Log
-            log_info(f"TEST CONNESSIONE: {name}")
-            log_info(f"JSON path: {json_path}")
+            log_info(f"TEST CONNESSIONE: {name}", json_path)
+            log_info(f"JSON path: {json_path}", json_path)
 
-            # Genera token
             token = self.api.get_token_from_file(json_path)
 
-            # Riscontro visivo
-            self.iface.messageBar().pushSuccess("PDND", f"Connessione '{name}' OK — token generato.")
-
-            # Log token
-            log_info(f"Token generato correttamente per '{name}'.")
-            log_info(f"Token (primi 50 caratteri): {token[:50]}...")
+            self.msg_success("PDND", f"Connessione '{name}' OK — token generato.")
+            log_info(f"Token generato correttamente per '{name}'.", json_path)
+            log_info(f"Token (primi 50 caratteri): {token[:50]}...", json_path)
 
         except Exception as e:
             msg = str(e)
-            self.iface.messageBar().pushCritical("PDND", f"Errore: {msg}")
+            self.msg_critical("PDND", f"Errore: {msg}")
             log_error(f"Errore test connessione '{name}': {msg}")
 
+    # ---------------------------------------------------------
+    # Caricamento layer
+    # ---------------------------------------------------------
     def load_pdnd_layer(self, name):
         loader = PdndLayerLoader(self.config_manager)
         try:
             loader.load(name)
-            self.iface.messageBar().pushSuccess("PDND", f"Layer '{name}' caricato.")
+            self.msg_success("PDND", f"Layer '{name}' caricato.")
         except Exception as e:
-            self.iface.messageBar().pushCritical("PDND", str(e))
+            self.msg_critical("PDND", str(e))
 
-    def msg_success(self, iface, title, text):
-        iface.messageBar().pushSuccess(title, text)
+    # ---------------------------------------------------------
+    # Messaggi
+    # ---------------------------------------------------------
+    def msg_success(self, title, text):
+        self.iface.messageBar().pushSuccess(title, text)
 
-    def msg_warning(self, iface, title, text):
-        iface.messageBar().pushWarning(title, text)
+    def msg_warning(self, title, text):
+        self.iface.messageBar().pushWarning(title, text)
 
-    def msg_critical(self, iface, title, text):
-        iface.messageBar().pushCritical(title, text)
+    def msg_critical(self, title, text):
+        self.iface.messageBar().pushCritical(title, text)
 
 
 class PdndDockWidget(QDockWidget):
