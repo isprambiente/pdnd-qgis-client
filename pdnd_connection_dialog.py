@@ -1,3 +1,4 @@
+import re
 from qgis.PyQt.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
     QPushButton, QComboBox, QFileDialog, QCheckBox
@@ -66,11 +67,13 @@ class PdndConnectionDialog(QDialog):
         layout.addWidget(QLabel("API URL"))
         layout.addWidget(self.api_edit)
 
-        # Checkbox debug + pretty JSON
+        # Checkbox debug + pretty JSON + mantieni in cache
         self.debug_checkbox = QCheckBox("Abilita debug PDND")
         self.pretty_checkbox = QCheckBox("Salva JSON in formato leggibile (pretty)")
+        self.cache_checkbox = QCheckBox("Mantieni in cache")
         layout.addWidget(self.debug_checkbox)
         layout.addWidget(self.pretty_checkbox)
+        layout.addWidget(self.cache_checkbox)
 
         # Se siamo in modalità modifica, precompila i campi
         if edit_mode and cfg is not None:
@@ -86,6 +89,7 @@ class PdndConnectionDialog(QDialog):
 
             self.debug_checkbox.setChecked(cfg.get("debug", False))
             self.pretty_checkbox.setChecked(cfg.get("pretty", False))
+            self.cache_checkbox.setChecked(cfg.get("cache", False))
 
         # Pulsanti OK / Annulla
         btn_layout = QHBoxLayout()
@@ -114,12 +118,15 @@ class PdndConnectionDialog(QDialog):
             self.key_edit.setText(path)
 
     def save(self):
-        name = self.name_edit.text().strip()
-        ambiente = self.env_combo.currentText()
+        raw_name = self.name_edit.text().strip()
+        name = self.sanitize_filename(raw_name)
 
         if not name:
+            QMessageBox.warning(self, "PDND", "Il nome inserito non è valido.")
             self.name_edit.setStyleSheet("border: 1px solid red;")
             return
+        
+        ambiente = self.env_combo.currentText()
 
         cfg = {
             "kid": self.kid_edit.text().strip(),
@@ -129,7 +136,8 @@ class PdndConnectionDialog(QDialog):
             "privKeyPath": self.key_edit.text().strip(),
             "apiUrl": self.api_edit.text().strip(),
             "debug": self.debug_checkbox.isChecked(),
-            "pretty": self.pretty_checkbox.isChecked()
+            "pretty": self.pretty_checkbox.isChecked(),
+            "cache": self.cache_checkbox.isChecked()
         }
 
         # Modalità modifica
@@ -155,6 +163,20 @@ class PdndConnectionDialog(QDialog):
 
         self.parent_panel.test_connection(name)
 
+    def sanitize_filename(self, name: str) -> str:
+        # minuscolo
+        name = name.lower().strip()
+
+        # sostituisci caratteri non validi con underscore
+        name = re.sub(r"[^\w]+", "_", name)
+
+        # rimuovi underscore multipli
+        name = re.sub(r"_+", "_", name)
+
+        # rimuovi underscore iniziali/finali
+        name = name.strip("_")
+
+        return name
 
 
 
