@@ -26,6 +26,13 @@ class PdndConnectionDialog(QDialog):
 
         self.resize(650, 700)
 
+        # Campi PDND
+        self.kid_edit = QLineEdit()
+        self.issuer_edit = QLineEdit()
+        self.client_edit = QLineEdit()
+        self.purpose_edit = QLineEdit()
+        self.key_edit = QLineEdit()
+
         # Nome connessione
         layout.addWidget(QLabel("Nome connessione"))
         self.name_edit = QLineEdit()
@@ -37,19 +44,16 @@ class PdndConnectionDialog(QDialog):
         self.env_combo.addItems(["produzione", "collaudo", "attestazione"])
         layout.addWidget(self.env_combo)
 
-        # Campi PDND
-        self.kid_edit = QLineEdit()
-        self.issuer_edit = QLineEdit()
-        self.client_edit = QLineEdit()
-        self.purpose_edit = QLineEdit()
-        self.key_edit = QLineEdit()
+        # API URL
+        layout.addWidget(QLabel("API URL"))
         self.api_edit = QLineEdit()
+        layout.addWidget(self.api_edit)
 
         for label, widget in [
-            ("kid", self.kid_edit),
-            ("issuer", self.issuer_edit),
-            ("clientId", self.client_edit),
-            ("purposeId", self.purpose_edit),
+            ("Kid", self.kid_edit),
+            ("Issuer", self.issuer_edit),
+            ("ClientId", self.client_edit),
+            ("PurposeId", self.purpose_edit),
         ]:
             layout.addWidget(QLabel(label))
             layout.addWidget(widget)
@@ -63,9 +67,7 @@ class PdndConnectionDialog(QDialog):
         key_layout.addWidget(key_btn)
         layout.addLayout(key_layout)
 
-        # API URL
-        layout.addWidget(QLabel("API URL"))
-        layout.addWidget(self.api_edit)
+        
 
         # Checkbox debug + pretty JSON + mantieni in cache
         self.debug_checkbox = QCheckBox("Abilita debug PDND")
@@ -129,12 +131,12 @@ class PdndConnectionDialog(QDialog):
         ambiente = self.env_combo.currentText()
 
         cfg = {
+            "apiUrl": self.api_edit.text().strip(),
             "kid": self.kid_edit.text().strip(),
             "issuer": self.issuer_edit.text().strip(),
             "clientId": self.client_edit.text().strip(),
             "purposeId": self.purpose_edit.text().strip(),
             "privKeyPath": self.key_edit.text().strip(),
-            "apiUrl": self.api_edit.text().strip(),
             "debug": self.debug_checkbox.isChecked(),
             "pretty": self.pretty_checkbox.isChecked(),
             "cache": self.cache_checkbox.isChecked()

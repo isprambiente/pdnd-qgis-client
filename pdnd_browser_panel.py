@@ -1,7 +1,7 @@
 import os
 from qgis.PyQt.QtWidgets import (
     QWidget, QVBoxLayout, QTreeWidget, QTreeWidgetItem,
-    QMenu, QDockWidget, QPushButton, QHBoxLayout
+    QMenu, QDockWidget, QPushButton, QHBoxLayout, QMessageBox
 )
 from qgis.PyQt.QtCore import Qt
 from .config_manager import ConfigManager
@@ -144,8 +144,13 @@ class PdndBrowserPanel(QWidget):
         self.refresh()
 
     def delete_connection(self, name):
-        self.config_manager.delete_configuration(name)
-        self.refresh()
+        reply = QMessageBox.question(self, "PDND",
+                                     f"Sei sicuro di voler eliminare la connessione '{name}'?",
+                                     QMessageBox.Yes | QMessageBox.No)
+
+        if reply == QMessageBox.Yes:
+            self.config_manager.delete_configuration(name)
+            self.refresh()
 
     # ---------------------------------------------------------
     # Test connessione
