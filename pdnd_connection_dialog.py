@@ -26,30 +26,27 @@ class PdndConnectionDialog(QDialog):
 
         self.resize(650, 700)
 
-        # Campi PDND
+        # Inizializzazione campi
+        self.name_edit = QLineEdit()
+        self.api_edit = QLineEdit()
+        self.env_combo = QComboBox()
+        self.env_combo.addItems(["produzione", "collaudo", "attestazione"])
+
         self.kid_edit = QLineEdit()
         self.issuer_edit = QLineEdit()
         self.client_edit = QLineEdit()
         self.purpose_edit = QLineEdit()
         self.key_edit = QLineEdit()
 
-        # Nome connessione
-        layout.addWidget(QLabel("Nome connessione"))
-        self.name_edit = QLineEdit()
-        layout.addWidget(self.name_edit)
+        self.debug_checkbox = QCheckBox("Abilita debug PDND")
+        self.pretty_checkbox = QCheckBox("Salva JSON in formato leggibile (pretty)")
+        self.cache_checkbox = QCheckBox("Mantieni in cache")
 
-        # Ambiente
-        layout.addWidget(QLabel("Ambiente"))
-        self.env_combo = QComboBox()
-        self.env_combo.addItems(["produzione", "collaudo", "attestazione"])
-        layout.addWidget(self.env_combo)
-
-        # API URL
-        layout.addWidget(QLabel("API URL"))
-        self.api_edit = QLineEdit()
-        layout.addWidget(self.api_edit)
-
+        # Campi PDND
         for label, widget in [
+            ("Nome connessione", self.name_edit),
+            ("Ambiente", self.env_combo),
+            ("API URL", self.api_edit),
             ("Kid", self.kid_edit),
             ("Issuer", self.issuer_edit),
             ("ClientId", self.client_edit),
@@ -57,7 +54,7 @@ class PdndConnectionDialog(QDialog):
         ]:
             layout.addWidget(QLabel(label))
             layout.addWidget(widget)
-
+        
         # Chiave privata con pulsante Sfoglia
         layout.addWidget(QLabel("Chiave privata"))
         key_layout = QHBoxLayout()
@@ -66,13 +63,8 @@ class PdndConnectionDialog(QDialog):
         key_btn.clicked.connect(self.select_key)
         key_layout.addWidget(key_btn)
         layout.addLayout(key_layout)
-
         
-
         # Checkbox debug + pretty JSON + mantieni in cache
-        self.debug_checkbox = QCheckBox("Abilita debug PDND")
-        self.pretty_checkbox = QCheckBox("Salva JSON in formato leggibile (pretty)")
-        self.cache_checkbox = QCheckBox("Mantieni in cache")
         layout.addWidget(self.debug_checkbox)
         layout.addWidget(self.pretty_checkbox)
         layout.addWidget(self.cache_checkbox)
@@ -81,13 +73,13 @@ class PdndConnectionDialog(QDialog):
         if edit_mode and cfg is not None:
             self.name_edit.setText(name)
             self.env_combo.setCurrentText(ambiente)
+            self.api_edit.setText(cfg.get("apiUrl", ""))
 
             self.kid_edit.setText(cfg.get("kid", ""))
             self.issuer_edit.setText(cfg.get("issuer", ""))
             self.client_edit.setText(cfg.get("clientId", ""))
             self.purpose_edit.setText(cfg.get("purposeId", ""))
             self.key_edit.setText(cfg.get("privKeyPath", ""))
-            self.api_edit.setText(cfg.get("apiUrl", ""))
 
             self.debug_checkbox.setChecked(cfg.get("debug", False))
             self.pretty_checkbox.setChecked(cfg.get("pretty", False))
@@ -101,10 +93,6 @@ class PdndConnectionDialog(QDialog):
         cancel_btn.clicked.connect(self.close)
         btn_layout.addWidget(ok_btn)
         btn_layout.addWidget(cancel_btn)
-
-        btn_test = QPushButton("Test Connessione")
-        btn_test.clicked.connect(self.run_test_from_dialog)
-        btn_layout.addWidget(btn_test)
 
         layout.addLayout(btn_layout)
         self.setLayout(layout)

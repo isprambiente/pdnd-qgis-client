@@ -1,3 +1,4 @@
+from os import name
 import os
 from qgis.PyQt.QtWidgets import (
     QWidget, QVBoxLayout, QTreeWidget, QTreeWidgetItem,
@@ -50,7 +51,7 @@ class PdndBrowserPanel(QWidget):
         self.tree.setHeaderLabel("Connessioni PDND")
         self.tree.setContextMenuPolicy(Qt.CustomContextMenu)
         self.tree.customContextMenuRequested.connect(self.open_menu)
-        self.tree.itemDoubleClicked.connect(self.double_click_load)
+        self.tree.itemDoubleClicked.connect(self.reload_layer)
 
         layout.addWidget(self.tree)
         self.setLayout(layout)
@@ -60,29 +61,25 @@ class PdndBrowserPanel(QWidget):
     # ---------------------------------------------------------
     # Azioni UI
     # ---------------------------------------------------------
-    def double_click_load(self, item, column):
-        name = item.text(0)
-        loader = PdndLayerLoader(self.config_manager)
-        try:
-            loader.load(name)
-            self.msg_success("PDND", f"Layer '{name}' caricato correttamente.")
-        except Exception as e:
-            self.msg_critical("PDND", str(e))
+    def reload_layer(self, item=None):
+        if item is None:
+            item = self.tree.currentItem()
+            if not item:
+                self.msg_warning("PDND", "Seleziona una connessione da aggiornare.")
+                return
 
-    def reload_layer(self):
-        item = self.tree.currentItem()
-        if not item:
-            self.msg_warning("PDND", "Seleziona una connessione da aggiornare.")
-            return
+        reply = QMessageBox.question(self, "PDND",
+                                     f"Sei sicuro di voler ricaricare i layer della connessione '{item.text(0)}'?",
+                                     QMessageBox.Yes | QMessageBox.No)
 
-        name = item.text(0)
-        loader = PdndLayerLoader(self.config_manager)
-
-        try:
-            loader.load(name, refresh=True)
-            self.msg_success("PDND", f"Layer '{name}' aggiornato.")
-        except Exception as e:
-            self.msg_critical("PDND", str(e))
+        if reply == QMessageBox.Yes:
+            name = item.text(0)
+            loader = PdndLayerLoader(self.config_manager)
+            try:
+                loader.load(name, refresh=True)
+                self.msg_success("PDND", f"Layer '{name}' aggiornato correttamente.")
+            except Exception as e:
+                self.msg_critical("PDND", str(e))
 
     def refresh(self):
         self.tree.clear()
@@ -102,12 +99,11 @@ class PdndBrowserPanel(QWidget):
             menu.addAction("Aggiorna Lista", self.refresh)
             menu.addAction("Carica Connessioni…", self.load_connections)
         else:
-            name = item.text(0)
-            menu.addAction("Carica Layer", lambda: self.load_pdnd_layer(name))
-            menu.addAction("Aggiorna Layer", lambda: self.reload_layer())
-            menu.addAction("Test Connessione", lambda: self.test_connection(name))
-            menu.addAction("Modifica Connessione…", lambda: self.edit_connection(name))
-            menu.addAction("Elimina Connessione", lambda: self.delete_connection(name))
+            menu.addAction("Carica Layer", lambda: self.load_pdnd_layer(item))
+            menu.addAction("Aggiorna Layer", lambda: self.reload_layer(item))
+            menu.addAction("Test Connessione", lambda: self.test_connection(item))
+            menu.addAction("Modifica Connessione…", lambda: self.edit_connection(item))
+            menu.addAction("Elimina Connessione", lambda: self.delete_connection(item))
 
         menu.exec(self.tree.mapToGlobal(pos))
 
@@ -119,7 +115,8 @@ class PdndBrowserPanel(QWidget):
         dlg.exec()
         self.refresh()
 
-    def edit_connection(self, name):
+    def edit_connection(self, item):
+        name = item.text(0)
         json_path = self.config_manager.get_json_path(name)
         if not json_path:
             self.msg_critical("PDND", f"Connessione '{name}' non trovata.")
@@ -143,7 +140,8 @@ class PdndBrowserPanel(QWidget):
         dlg.exec()
         self.refresh()
 
-    def delete_connection(self, name):
+    def delete_connection(self, item):
+        name = item.text(0)
         reply = QMessageBox.question(self, "PDND",
                                      f"Sei sicuro di voler eliminare la connessione '{name}'?",
                                      QMessageBox.Yes | QMessageBox.No)
@@ -155,13 +153,11 @@ class PdndBrowserPanel(QWidget):
     # ---------------------------------------------------------
     # Test connessione
     # ---------------------------------------------------------
-    def test_connection(self, name=None):
-        if not name:
-            item = self.tree.currentItem()
-            if not item:
-                self.msg_warning("PDND", "Seleziona una connessione da testare.")
-                return
-            name = item.text(0)
+    def test_connection(self, item=None):
+        if not item:
+            self.msg_warning("PDND", "Seleziona una connessione da testare.")
+            return
+        name = item.text(0)
 
         json_path = self.config_manager.get_json_path(name)
         if not json_path:
@@ -186,8 +182,9 @@ class PdndBrowserPanel(QWidget):
     # ---------------------------------------------------------
     # Caricamento layer
     # ---------------------------------------------------------
-    def load_pdnd_layer(self, name):
+    def load_pdnd_layer(self, item):
         loader = PdndLayerLoader(self.config_manager)
+        name = item.text(0)
         try:
             loader.load(name)
             self.msg_success("PDND", f"Layer '{name}' caricato.")
