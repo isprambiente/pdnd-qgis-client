@@ -1,10 +1,10 @@
-publiccodeYmlVersion: 0.5.0
+publiccodeYmlVersion: "0"
 name: PDND QGIS Client
 applicationSuite: PDNDClient
 url: https://github.com/isprambiente/pdnd-qgis-client.git
 landingURL: https://github.com/isprambiente/pdnd-qgis-client
 softwareVersion: 1.0.0
-releaseDate: 2026-08-11
+releaseDate: 2026-08-23
 logo: https://github.com/isprambiente/pdnd-qgis-client/blob/main/icon.png
 platforms:
   - windows
@@ -20,12 +20,12 @@ categories:
   - it-security
   - content-management
 organisation:
-  uri: https://www.isprambiente.gov.it
+  uri: urn:x-italian-pa:ispra_rm
   name: ISPRA
 usedBy:
   - ISPRA
-developmentStatus: development
-softwareType: library
+developmentStatus: stable
+softwareType: addon
 description:
   it-IT:
     localisedName: PDND QGIS Client
@@ -60,6 +60,14 @@ description:
       - Messaggi colorati tramite QGIS MessageBar
       - Gestione errori PDND (token, API, OAS3)
       - Compatibile con QGIS LTR 3.44+
+      - Libreria pdnd-python-client v0.1.21 già inclusa (isprambiente/pdnd-python-client)
+    screenshots:
+      - docs/images/01_browser_panel.png
+      - docs/images/02_browser_panel_menu.png
+      - docs/images/03_config_panel_new.png
+      - docs/images/04_config_panel_edit.png
+      - docs/images/05_import_panel.png
+      - docs/images/06_view_layers.png
 legal:
   license: MIT
 maintenance:
@@ -68,6 +76,7 @@ maintenance:
     - name: Francesco Loreti
       email: francesco.loreti@isprambiente.it
       phone: "0650072225"
+      affiliation: ISPRA
 localisation:
   localisationReady: false
   availableLanguages:
@@ -78,6 +87,10 @@ dependsOn:
       versionMin: 3.44 LTS
       version: 3.44 LTS
       optional: false
+    - name: pdnd-python-client
+      versionMin: 0.1.21
+      version: 0.1.21
+      optional: false
 IT:
   countryExtensionVersion: "1.0"
   piattaforme:
@@ -86,5 +99,3 @@ IT:
     anpr: false
     pagopa: false
     io: false
-  riuso:
-    codiceIPA: ispra_rm

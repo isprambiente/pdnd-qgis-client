@@ -4,6 +4,7 @@
 [![QGIS Plugin](https://img.shields.io/badge/QGIS-Plugin-green.svg)](https://qgis.org)
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
 [![Status](https://img.shields.io/badge/Status-Active-success.svg)]()
+[![pdnd-python-client](https://img.shields.io/badge/uses-pdnd--python--client-orange.svg)](https://github.com/isprambiente/pdnd-python-client)
 [![PublicCode](https://img.shields.io/badge/publiccode.yml-Compliant-0A66C2.svg)]()
 
 ---
@@ -23,6 +24,16 @@
 
 ---
 
+## Dipendenze
+
+Questo plugin include e utilizza in riuso il client Python PDND sviluppato dallo stesso ente (ISPRA):
+
+| Libreria | Repository | Descrizione |
+|---|---|---|
+| `pdnd-python-client` | [isprambiente/pdnd-python-client](https://github.com/isprambiente/pdnd-python-client) | Client Python ISPRA per autenticazione PDND (JWT + token) — riuso interno |
+
+---
+
 ## Funzionalità
 
 - Gestione connessioni PDND (clientId, privateKey, kid, apiUrl)
@@ -33,6 +44,22 @@
 - Messaggi colorati tramite QGIS MessageBar
 - Gestione errori PDND (token, API, OAS3)
 - Compatibile con QGIS LTR 3.44+
+
+---
+
+## Screenshot
+
+| Pannello PDND | Menu contestuale |
+|:---:|:---:|
+| ![Pannello PDND](docs/images/01_browser_panel.png) | ![Menu contestuale](docs/images/02_browser_panel_menu.png) |
+
+| Nuova connessione | Modifica connessione |
+|:---:|:---:|
+| ![Nuova connessione](docs/images/03_config_panel_new.png) | ![Modifica connessione](docs/images/04_config_panel_edit.png) |
+
+| Importa configurazione | Layer caricati in QGIS |
+|:---:|:---:|
+| ![Importa configurazione](docs/images/05_import_panel.png) | ![Layer caricati](docs/images/06_view_layers.png) |
 
 ---
 
@@ -85,9 +112,9 @@ Inserisci i parametri:
 - apiUrl: URL API PDND (es. https://pdnd.developers.italia.it/api/v1)  
 - ambiente: produzione | collaudo | attestazione
 
-### 2. Crea il file JSON della chiave privata
+### 2. Crea il file JSON della configurazione
 
-Il file JSON deve contenere la tua chiave privata nel formato JWK (JSON Web Key):
+Il file JSON deve contenere la configurazione nel formato richiesto da PDND:
 
 ```json
 {
@@ -109,18 +136,6 @@ Il file JSON deve contenere la tua chiave privata nel formato JWK (JSON Web Key)
 ## Riuso e PublicCode
 
 Questo repository è conforme ai requisiti di PublicCode per il riuso nel settore pubblico italiano.
-
-Il file publiccode.yml contiene:
-
-metadata: informazioni sul progetto
-
-source: URL del repository  
-version: versione del software  
-license: licenza (MIT)
-
-reusable: true (il software è riutilizzabile)
-
-doc: documentazione completa
 
 ---
 
