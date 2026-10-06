@@ -1,4 +1,4 @@
-publiccodeYmlVersion: "0"
+publiccodeYmlVersion: 0.5.0
 name: PDND QGIS Client
 applicationSuite: PDNDClient
 url: https://github.com/isprambiente/pdnd-qgis-client.git
